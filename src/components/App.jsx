@@ -23,6 +23,9 @@ export default class App extends Component {
     // ],
     // filter: '',
     query: '',
+    data: [],
+    largeImageURL: '',
+    alt: '',
   };
 
   // countTotalContacts = () => {
@@ -50,6 +53,10 @@ export default class App extends Component {
     });
   };
 
+  onImageClick = (largeImageURL, alt) => {
+    this.setState({ largeImageURL, alt });
+  };
+
   // changeFilter = event => {
   //   this.setState({ filter: event.currentTarget.value });
   // };
@@ -64,7 +71,7 @@ export default class App extends Component {
     return (
       <>
         <SearchBar onSubmit={this.formSubmitHandler} />
-        <ImageGallery />
+        <ImageGallery data={this.state.data} onImageClick={this.onImageClick} />
         <Container>
           {/* <Section title="Phonebook">
           <AddContactForm onSubmit={this.formSubmitHandler} />

@@ -1,10 +1,8 @@
 import { Component } from 'react';
 import Notiflix from 'notiflix';
 import { GlobalStyleComponent } from 'styles/GlobalStyles';
+import axios from 'axios';
 
-import AddContactForm from './AddContactForm/AddContactForm';
-import ContactFilter from './ContactFilter/ContactFilter';
-import ContactList from './ContactList/ContactList';
 import Section from './Section/Section';
 import Notification from './Notification/Notification';
 
@@ -12,82 +10,115 @@ import { Container } from './Container/Container.styled';
 
 import SearchBar from './SearchBar/SearchBar';
 import ImageGallery from './ImageGallery/ImageGallery';
+import Button from './Button/Button';
 
 export default class App extends Component {
+  #URL = 'https://pixabay.com/api/';
+  #API_KEY = '31539344-c129af0d709d10cb9757ecef9';
+
   state = {
-    // contacts: [
-    //   { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
-    //   { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
-    //   { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
-    //   { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
-    // ],
-    // filter: '',
     query: '',
     data: [],
+    page: 1,
+    totalHits: 0,
     largeImageURL: '',
     alt: '',
+    error: '',
   };
 
-  // countTotalContacts = () => {
-  //   const { contacts } = this.state;
-  //   return contacts.length;
-  // };
+  componentDidUpdate(_, prevState) {
+    const prevQuery = prevState.query;
+    const nextQuery = this.state.query;
+    const prevPage = prevState.page;
+    const nextPage = this.state.page;
 
-  // deleteContact = contactId => {
-  //   const { contacts } = this.state;
-
-  //   for (const contact of contacts) {
-  //     if (contact.id === contactId) {
-  //       Notiflix.Notify.success(`"${contact.name}" successfully deleted`);
-  //     }
-  //   }
-
-  //   this.setState(prevState => ({
-  //     contacts: prevState.contacts.filter(el => el.id !== contactId),
-  //   }));
-  // };
+    if (prevQuery !== nextQuery || prevPage !== nextPage) {
+      // this.setState({ status: Status.PENDING, error: '' });
+      this.axiosSearchImages(nextQuery, nextPage)
+        .then(response => {
+          const imgData = response.data.hits.map(
+            ({ id, largeImageURL, tags, webformatURL }) => ({
+              id,
+              largeImageURL,
+              tags,
+              webformatURL,
+            })
+          );
+          return {
+            data: imgData,
+            totalHits: response.data.totalHits,
+          };
+        })
+        .then(({ data, totalHits }) => {
+          if (!data.length) {
+            this.setState({
+              error:
+                'Sorry, there are no images matching your search query.Please try again.',
+              // status: Status.RESOLVED,
+            });
+            return;
+          }
+          this.setState(prevState => ({
+            data: [...prevState.data, ...data],
+            totalHits: totalHits,
+            // status: Status.RESOLVED,
+          }));
+        })
+        .catch(() =>
+          this.setState({
+            error: 'Something went wrong...',
+            // status: Status.REJECTED,
+          })
+        );
+    }
+  }
 
   formSubmitHandler = searchQuery => {
     this.setState({
       query: searchQuery,
+      page: 1,
+      data: [],
     });
   };
+
+  axiosSearchImages(query, page) {
+    return axios.get(
+      `${this.#URL}?key=${
+        this.#API_KEY
+      }&q=${query}&page=${page}&per_page=12&image_type=photo&orientation=horizontal&safesearch=true`
+    );
+  }
 
   onImageClick = (largeImageURL, alt) => {
     this.setState({ largeImageURL, alt });
   };
 
-  // changeFilter = event => {
-  //   this.setState({ filter: event.currentTarget.value });
-  // };
+  loadMore = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
+  };
 
   render() {
-    // const { contacts, filter } = this.state;
-    // const normalizedFilter = filter.toLowerCase();
-    // const filteredContacts = contacts.filter(contact =>
-    //   contact.name.toLowerCase().includes(normalizedFilter)
-    // );
+    const {
+      searchName,
+      data,
+      error,
+      status,
+      page,
+      largeImageURL,
+      alt,
+      totalHits,
+    } = this.state;
+
+    const isBtnShown = totalHits !== 0 && totalHits > data.length;
 
     return (
       <>
         <SearchBar onSubmit={this.formSubmitHandler} />
-        <ImageGallery data={this.state.data} onImageClick={this.onImageClick} />
-        <Container>
-          {/* <Section title="Phonebook">
-          <AddContactForm onSubmit={this.formSubmitHandler} />
-          <ContactFilter filter={filter} onChange={this.changeFilter} />
-        </Section>
-        <Section title="Contacts">
-          {this.countTotalContacts() ? (
-            <ContactList
-              contacts={filteredContacts}
-              onDeleteContact={this.deleteContact}
-            />
-          ) : (
-            <Notification message="There is no contacts" />
-          )}
-        </Section> */}
-        </Container>
+        <ImageGallery data={data} onImageClick={this.onImageClick} />
+        {isBtnShown && <Button loadMore={this.loadMore} />}
+        <Container></Container>
         <GlobalStyleComponent />
       </>
     );

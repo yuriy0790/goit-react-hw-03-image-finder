@@ -1,5 +1,5 @@
 import { Component } from 'react';
-import Spinner from 'react-spinner-material';
+import { Puff } from 'react-loader-spinner';
 import { GlobalStyleComponent } from 'styles/GlobalStyles';
 import axios from 'axios';
 
@@ -119,7 +119,16 @@ export default class App extends Component {
           <ImageGallery data={data} onImgClick={this.onImgClick} />
           {status === 'pending' && (
             <>
-              <Spinner radius={30} color={'tomato'} stroke={6} visible={true} />
+              <Puff
+                height="80"
+                width="80"
+                radius={1}
+                color="#4fa94d"
+                ariaLabel="puff-loading"
+                wrapperStyle={{}}
+                wrapperClass=""
+                visible={true}
+              />
               <p>Loading images by query: {query} ...</p>
             </>
           )}

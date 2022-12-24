@@ -19,7 +19,8 @@ class Modal extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('keydown', this.handleKeyDown);
-    window.removeEventListener('load', this.hideSpinner);
+    const largeImage = document.querySelector('#largeImage');
+    largeImage.removeEventListener('load', this.hideSpinner);
     this.setState({ showSpinner: true });
   }
 

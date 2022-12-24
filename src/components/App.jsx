@@ -1,9 +1,10 @@
 import { Component } from 'react';
 import { GlobalStyleComponent } from 'styles/GlobalStyles';
-import axios from 'axios';
+// import axios from 'axios';
 
 import { AppWrap } from './AppWrap/AppWrap.styled';
 
+import axiosSearchImages from '../services/axiosSearchImages';
 import SearchBar from './SearchBar/SearchBar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Button from './Button/Button';
@@ -18,8 +19,8 @@ const Status = {
 };
 
 export default class App extends Component {
-  #URL = 'https://pixabay.com/api/';
-  #API_KEY = '31539344-c129af0d709d10cb9757ecef9';
+  // #URL = 'https://pixabay.com/api/';
+  // #API_KEY = '31539344-c129af0d709d10cb9757ecef9';
 
   state = {
     query: '',
@@ -40,18 +41,10 @@ export default class App extends Component {
 
     if (prevQuery !== nextQuery || prevPage !== nextPage) {
       this.setState({ status: Status.PENDING, error: '' });
-      this.axiosSearchImages(nextQuery, nextPage)
+      axiosSearchImages(nextQuery, nextPage)
         .then(response => {
-          const imgData = response.data.hits.map(
-            ({ id, largeImageURL, tags, webformatURL }) => ({
-              id,
-              largeImageURL,
-              tags,
-              webformatURL,
-            })
-          );
           return {
-            data: imgData,
+            data: response.data.hits,
             totalHits: response.data.totalHits,
           };
         })
@@ -87,13 +80,13 @@ export default class App extends Component {
     });
   };
 
-  axiosSearchImages(query, page) {
-    return axios.get(
-      `${this.#URL}?key=${
-        this.#API_KEY
-      }&q=${query}&page=${page}&per_page=12&image_type=photo&orientation=horizontal&safesearch=true`
-    );
-  }
+  // axiosSearchImages(query, page) {
+  //   return axios.get(
+  //     `${this.#URL}?key=${
+  //       this.#API_KEY
+  //     }&q=${query}&page=${page}&per_page=12&image_type=photo&orientation=horizontal&safesearch=true`
+  //   );
+  // }
 
   onImgClick = (largeImageURL, alt) => {
     this.setState({ largeImageURL, alt });

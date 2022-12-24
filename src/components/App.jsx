@@ -1,16 +1,21 @@
 import { Component } from 'react';
-import Notiflix from 'notiflix';
+import Spinner from 'react-spinner-material';
 import { GlobalStyleComponent } from 'styles/GlobalStyles';
 import axios from 'axios';
 
-import Section from './Section/Section';
-import Notification from './Notification/Notification';
-
-import { Container } from './Container/Container.styled';
+import { AppWrap } from './AppWrap/AppWrap.styled';
 
 import SearchBar from './SearchBar/SearchBar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Button from './Button/Button';
+import Modal from './Modal/Modal';
+
+const Status = {
+  IDLE: 'idle',
+  PENDING: 'pending',
+  RESOLVED: 'resolved',
+  REJECTED: 'rejected',
+};
 
 export default class App extends Component {
   #URL = 'https://pixabay.com/api/';
@@ -24,6 +29,7 @@ export default class App extends Component {
     largeImageURL: '',
     alt: '',
     error: '',
+    status: '',
   };
 
   componentDidUpdate(_, prevState) {
@@ -33,7 +39,7 @@ export default class App extends Component {
     const nextPage = this.state.page;
 
     if (prevQuery !== nextQuery || prevPage !== nextPage) {
-      // this.setState({ status: Status.PENDING, error: '' });
+      this.setState({ status: Status.PENDING, error: '' });
       this.axiosSearchImages(nextQuery, nextPage)
         .then(response => {
           const imgData = response.data.hits.map(
@@ -53,21 +59,21 @@ export default class App extends Component {
           if (!data.length) {
             this.setState({
               error:
-                'Sorry, there are no images matching your search query.Please try again.',
-              // status: Status.RESOLVED,
+                'Sorry, there are no images matching your search query. Please try again.',
+              status: Status.REJECTED,
             });
             return;
           }
           this.setState(prevState => ({
             data: [...prevState.data, ...data],
             totalHits: totalHits,
-            // status: Status.RESOLVED,
+            status: Status.RESOLVED,
           }));
         })
         .catch(() =>
           this.setState({
             error: 'Something went wrong...',
-            // status: Status.REJECTED,
+            status: Status.REJECTED,
           })
         );
     }
@@ -89,7 +95,7 @@ export default class App extends Component {
     );
   }
 
-  onImageClick = (largeImageURL, alt) => {
+  onImgClick = (largeImageURL, alt) => {
     this.setState({ largeImageURL, alt });
   };
 
@@ -100,25 +106,33 @@ export default class App extends Component {
   };
 
   render() {
-    const {
-      searchName,
-      data,
-      error,
-      status,
-      page,
-      largeImageURL,
-      alt,
-      totalHits,
-    } = this.state;
+    const { query, data, totalHits, largeImageURL, alt, error, status } =
+      this.state;
 
-    const isBtnShown = totalHits !== 0 && totalHits > data.length;
+    const isBtnShown =
+      error === '' && totalHits !== 0 && totalHits > data.length;
 
     return (
       <>
-        <SearchBar onSubmit={this.formSubmitHandler} />
-        <ImageGallery data={data} onImageClick={this.onImageClick} />
-        {isBtnShown && <Button loadMore={this.loadMore} />}
-        <Container></Container>
+        <AppWrap>
+          <SearchBar onSubmit={this.formSubmitHandler} />
+          <ImageGallery data={data} onImgClick={this.onImgClick} />
+          {status === 'pending' && (
+            <>
+              <Spinner radius={30} color={'tomato'} stroke={6} visible={true} />
+              <p>Loading images by query: {query} ...</p>
+            </>
+          )}
+          {(status === 'rejected' || error) && <p>{error}</p>}
+          {isBtnShown && <Button loadMore={this.loadMore} />}
+        </AppWrap>
+        {this.state.largeImageURL && (
+          <Modal
+            alt={alt}
+            largeImageURL={largeImageURL}
+            onImgClick={this.onImgClick}
+          />
+        )}
         <GlobalStyleComponent />
       </>
     );

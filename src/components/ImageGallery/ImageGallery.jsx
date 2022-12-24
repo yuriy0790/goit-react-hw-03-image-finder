@@ -17,7 +17,7 @@ const ImageGallery = ({ data, onImgClick }) => (
 );
 export default ImageGallery;
 
-// ImageGallery.propTypes = {
-//   contacts: PropTypes.array.isRequired,
-//   onDeleteContact: PropTypes.func.isRequired,
-// };
+ImageGallery.propTypes = {
+  data: PropTypes.array.isRequired,
+  onImgClick: PropTypes.func.isRequired,
+};

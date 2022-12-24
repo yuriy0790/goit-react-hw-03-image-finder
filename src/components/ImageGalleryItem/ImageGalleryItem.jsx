@@ -11,7 +11,9 @@ const ImageGalleryItem = ({ smallImg, bigImg, alt, onImgClick }) => (
 );
 export default ImageGalleryItem;
 
-// ImageGallery.propTypes = {
-//   contacts: PropTypes.array.isRequired,
-//   onDeleteContact: PropTypes.func.isRequired,
-// };
+ImageGalleryItem.propTypes = {
+  smallImg: PropTypes.string,
+  bigImg: PropTypes.string,
+  alt: PropTypes.string,
+  onImgClick: PropTypes.func.isRequired,
+};

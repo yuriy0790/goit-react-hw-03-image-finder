@@ -2,17 +2,26 @@ import React, { Component } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import styles from './Modal.module.css';
-import { Puff } from 'react-loader-spinner';
+import Loader from '../Loader/Loader';
 
 const modalRoot = document.querySelector('#modal-root');
 
 class Modal extends Component {
+  state = {
+    showSpinner: true,
+  };
+
   componentDidMount() {
     window.addEventListener('keydown', this.handleKeyDown);
+    const largeImage = document.querySelector('#largeImage');
+    largeImage.addEventListener('load', () => {
+      this.setState({ showSpinner: false });
+    });
   }
 
   componentWillUnmount() {
     window.removeEventListener('keydown', this.handleKeyDown);
+    this.setState({ showSpinner: true });
   }
 
   handleKeyDown = e => {
@@ -30,20 +39,13 @@ class Modal extends Component {
   render() {
     return createPortal(
       <div className={styles.Overlay} onClick={this.handleBackdropClick}>
-        <div className={styles.spinner}>
-          <Puff
-            height="80"
-            width="80"
-            radius={1}
-            color="#4fa94d"
-            ariaLabel="puff-loading"
-            wrapperStyle={{}}
-            wrapperClass=""
-            visible={true}
-          />
-        </div>
+        {this.state.showSpinner === true && <Loader />}
         <div className={styles.Modal}>
-          <img src={this.props.largeImageURL} alt={this.props.alt} />
+          <img
+            id="largeImage"
+            src={this.props.largeImageURL}
+            alt={this.props.alt}
+          />
         </div>
       </div>,
 

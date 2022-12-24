@@ -1,26 +1,35 @@
 import React, { Component } from 'react';
+import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import styles from './Modal.module.css';
 import { Puff } from 'react-loader-spinner';
 
+const modalRoot = document.querySelector('#modal-root');
+
 class Modal extends Component {
   componentDidMount() {
-    document.addEventListener('keydown', () => this.props.onImgClick(''));
+    window.addEventListener('keydown', this.handleKeyDown);
   }
 
   componentWillUnmount() {
-    document.removeEventListener('keydown', () => this.props.onImgClick(''));
+    window.removeEventListener('keydown', this.handleKeyDown);
   }
 
-  onBackdropClick = event => {
+  handleKeyDown = e => {
+    if (e.code === 'Escape') {
+      this.props.onImgClick('');
+    }
+  };
+
+  handleBackdropClick = event => {
     if (event.target === event.currentTarget) {
       this.props.onImgClick('');
     }
   };
 
   render() {
-    return (
-      <div className={styles.Overlay} onClick={this.onBackdropClick}>
+    return createPortal(
+      <div className={styles.Overlay} onClick={this.handleBackdropClick}>
         <div className={styles.spinner}>
           <Puff
             height="80"
@@ -36,7 +45,9 @@ class Modal extends Component {
         <div className={styles.Modal}>
           <img src={this.props.largeImageURL} alt={this.props.alt} />
         </div>
-      </div>
+      </div>,
+
+      modalRoot
     );
   }
 }

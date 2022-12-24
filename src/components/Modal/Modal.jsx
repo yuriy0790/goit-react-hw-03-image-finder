@@ -14,15 +14,18 @@ class Modal extends Component {
   componentDidMount() {
     window.addEventListener('keydown', this.handleKeyDown);
     const largeImage = document.querySelector('#largeImage');
-    largeImage.addEventListener('load', () => {
-      this.setState({ showSpinner: false });
-    });
+    largeImage.addEventListener('load', this.hideSpinner);
   }
 
   componentWillUnmount() {
     window.removeEventListener('keydown', this.handleKeyDown);
+    window.removeEventListener('load', this.hideSpinner);
     this.setState({ showSpinner: true });
   }
+
+  hideSpinner = () => {
+    this.setState({ showSpinner: false });
+  };
 
   handleKeyDown = e => {
     if (e.code === 'Escape') {

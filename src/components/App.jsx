@@ -1,5 +1,4 @@
 import { Component } from 'react';
-import { Puff } from 'react-loader-spinner';
 import { GlobalStyleComponent } from 'styles/GlobalStyles';
 import axios from 'axios';
 
@@ -9,6 +8,7 @@ import SearchBar from './SearchBar/SearchBar';
 import ImageGallery from './ImageGallery/ImageGallery';
 import Button from './Button/Button';
 import Modal from './Modal/Modal';
+import Loader from './Loader/Loader';
 
 const Status = {
   IDLE: 'idle',
@@ -119,16 +119,7 @@ export default class App extends Component {
           <ImageGallery data={data} onImgClick={this.onImgClick} />
           {status === 'pending' && (
             <>
-              <Puff
-                height="80"
-                width="80"
-                radius={1}
-                color="#4fa94d"
-                ariaLabel="puff-loading"
-                wrapperStyle={{}}
-                wrapperClass=""
-                visible={true}
-              />
+              <Loader />
               <p>Loading images by query: {query} ...</p>
             </>
           )}

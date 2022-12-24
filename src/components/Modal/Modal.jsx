@@ -4,13 +4,8 @@ import styles from './Modal.module.css';
 import { Puff } from 'react-loader-spinner';
 
 class Modal extends Component {
-  state = {
-    showSpinner: true,
-  };
-
   componentDidMount() {
     document.addEventListener('keydown', () => this.props.onImgClick(''));
-    // this.setState({ showSpinner: false });
   }
 
   componentWillUnmount() {
@@ -26,7 +21,7 @@ class Modal extends Component {
   render() {
     return (
       <div className={styles.Overlay} onClick={this.onBackdropClick}>
-        {this.state.showSpinner && (
+        <div className={styles.spinner}>
           <Puff
             height="80"
             width="80"
@@ -37,7 +32,7 @@ class Modal extends Component {
             wrapperClass=""
             visible={true}
           />
-        )}
+        </div>
         <div className={styles.Modal}>
           <img src={this.props.largeImageURL} alt={this.props.alt} />
         </div>

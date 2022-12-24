@@ -1,9 +1,7 @@
 import { Component } from 'react';
 import { GlobalStyleComponent } from 'styles/GlobalStyles';
-// import axios from 'axios';
 
 import { AppWrap } from './AppWrap/AppWrap.styled';
-
 import axiosSearchImages from '../services/axiosSearchImages';
 import SearchBar from './SearchBar/SearchBar';
 import ImageGallery from './ImageGallery/ImageGallery';
@@ -19,9 +17,6 @@ const Status = {
 };
 
 export default class App extends Component {
-  // #URL = 'https://pixabay.com/api/';
-  // #API_KEY = '31539344-c129af0d709d10cb9757ecef9';
-
   state = {
     query: '',
     data: [],
@@ -79,14 +74,6 @@ export default class App extends Component {
       data: [],
     });
   };
-
-  // axiosSearchImages(query, page) {
-  //   return axios.get(
-  //     `${this.#URL}?key=${
-  //       this.#API_KEY
-  //     }&q=${query}&page=${page}&per_page=12&image_type=photo&orientation=horizontal&safesearch=true`
-  //   );
-  // }
 
   onImgClick = (largeImageURL, alt) => {
     this.setState({ largeImageURL, alt });
